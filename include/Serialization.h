@@ -4,13 +4,13 @@
 #include "Needs/NeedCold.h"
 #include "Needs/NeedExhaustion.h"
 #include "Utility.h"
+#include "Utility/GlobalValueUpdater.h"
 
 namespace Serialization
 {
 	static constexpr std::uint32_t SerializationVersion = 1;
 	static constexpr std::uint32_t ID = 'SMIF';
 	static constexpr std::uint32_t SerializationType = 'SMIV';
-	void LoadPreLoadGlobalVals();
 	
 	/// <summary>
 	/// Checks to run when reloading a save or new game
@@ -36,7 +36,7 @@ namespace Serialization
 
 		//Overwrite globals so esp edits take effect mid save
 		if (util->forceUpdateGlobalValues) {
-			LoadPreLoadGlobalVals();
+            GlobalUpdater::RefreshGlobals();
 		}
 
 		if (!util->HelpManualPC->HasForm(util->Survival_HelpSurvivalModeLong)) {
@@ -157,53 +157,5 @@ namespace Serialization
 		utility->WasInOblivion = false;
 	}
 
-	void LoadPreLoadGlobalVals()
-	{
-		logger::info("Load global values for updating");
-
-		auto util = Utility::GetSingleton();
-		auto cold = NeedCold::GetSingleton();
-		auto exhaustion = NeedExhaustion::GetSingleton();
-		auto hunger = NeedHunger::GetSingleton();
-
-		//Cold
-		cold->NeedStage1->value = util->LoadColdStage1Val;
-		cold->NeedStage2->value = util->LoadColdStage2Val;
-		cold->NeedStage3->value = util->LoadColdStage3Val;
-		cold->NeedStage4->value = util->LoadColdStage4Val;
-		cold->NeedStage5->value = util->LoadColdStage5Val;
-		util->SMI_ColdShouldBeEnabled->value = util->coldShouldBeEnabled;
-		cold->NeedAvPenDisabled->value = util->coldAVPenDisabled;
-		cold->Survival_ColdResistMaxValue->value = util->coldResistMaxValue;
-		cold->Survival_AfflictionColdChance->value = util->coldAfflictionChance;
-
-		//Exhaustion
-		exhaustion->NeedStage1->value = util->LoadExhaustionStage1Val;
-		exhaustion->NeedStage2->value = util->LoadExhaustionStage2Val;
-		exhaustion->NeedStage3->value = util->LoadExhaustionStage3Val;
-		exhaustion->NeedStage4->value = util->LoadExhaustionStage4Val;
-		exhaustion->NeedStage5->value = util->LoadExhaustionStage5Val;
-		util->SMI_ExhaustionShouldBeEnabled->value = util->exhaustionShouldBeEnabled;
-		exhaustion->NeedAvPenDisabled->value = util->exhaustionAVPenDisabled;
-		exhaustion->Survival_AfflictionExhaustionChance->value = util->exhaustionAfflictionChance;
-
-		//hunger
-		hunger->NeedStage1->value = util->LoadHungerStage1Val;
-		hunger->NeedStage2->value = util->LoadHungerStage2Val;
-		hunger->NeedStage3->value = util->LoadHungerStage3Val;
-		hunger->NeedStage4->value = util->LoadHungerStage4Val;
-		hunger->NeedStage5->value = util->LoadHungerStage5Val;
-		util->SMI_HungerShouldBeEnabled->value = util->hungerShouldBeEnabled;
-		hunger->NeedAvPenDisabled->value = util->hungerAVPenDisabled;
-		hunger->Survival_AfflictionHungerChance->value = util->hungerAfflictionChance;
-
-		exhaustion->NeedMaxValue->value = util->exhaustionMaxValue;
-		cold->NeedMaxValue->value = util->coldMaxValue;
-		hunger->NeedMaxValue->value = util->hungerMaxValue;
-
-		exhaustion->Survival_ExhaustionRestorePerHour->value = util->exhaustionRestorePerHour;
-		cold->SMI_ColdRate->value = util->coldRate;
-		hunger->NeedRate->value = util->hungerRate = hunger->NeedRate->value;
-		exhaustion->NeedRate->value = util->exhaustionRate = exhaustion->NeedRate->value;
-	}
+	
 }

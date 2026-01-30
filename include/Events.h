@@ -6,6 +6,8 @@
 
 #undef GetObject
 
+//TODO - Split this file up its much too big
+
 namespace Events
 {
 	static inline float Hours;

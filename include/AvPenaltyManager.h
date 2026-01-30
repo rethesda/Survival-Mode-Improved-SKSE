@@ -274,6 +274,10 @@ private:
 
         float magDelta = lastPenaltyMag - newPenaltyMag;
 
+        if (magDelta > 0) {
+            player->AsActorValueOwner()->RestoreActorValue(RE::ACTOR_VALUE_MODIFIER::kDamage, handler.affectedAV, -1*magDelta);
+        }
+
         player->AsActorValueOwner()->SetActorValue(handler.trackedAV, newPenaltyMag);
         player->AsActorValueOwner()->RestoreActorValue(RE::ACTOR_VALUE_MODIFIER::kPermanent, handler.affectedAV, magDelta);
 

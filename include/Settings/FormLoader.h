@@ -53,8 +53,6 @@ public:
         logger::info("All forms are loaded.");
         LoadCompatibilityForms(dataHandler);
         logger::info("Compatibility forms are loaded.");
-        StoreGlobalValuesPreSave();
-        logger::info("Pre load global values for updating");
     }
 
     void LoadHungerForms(RE::TESDataHandler* dataHandler)
@@ -743,54 +741,5 @@ public:
         utility->DoCombatSpellApplyAddress    = RELOCATION_ID(37666, 38620).address();
         utility->EnableFtAddress              = RELOCATION_ID(54946, 55563).address();
         utility->IsFtEnabledAddress           = RELOCATION_ID(54848, 55481).address();
-    }
-
-    void StoreGlobalValuesPreSave()
-    {
-        auto util       = Utility::GetSingleton();
-        auto cold       = NeedCold::GetSingleton();
-        auto exhaustion = NeedExhaustion::GetSingleton();
-        auto hunger     = NeedHunger::GetSingleton();
-
-        util->LoadColdStage1Val = cold->NeedStage1->value;
-        util->LoadColdStage2Val = cold->NeedStage2->value;
-        util->LoadColdStage3Val = cold->NeedStage3->value;
-        util->LoadColdStage4Val = cold->NeedStage4->value;
-        util->LoadColdStage5Val = cold->NeedStage5->value;
-
-        util->LoadExhaustionStage1Val = exhaustion->NeedStage1->value;
-        util->LoadExhaustionStage2Val = exhaustion->NeedStage2->value;
-        util->LoadExhaustionStage3Val = exhaustion->NeedStage3->value;
-        util->LoadExhaustionStage4Val = exhaustion->NeedStage4->value;
-        util->LoadExhaustionStage5Val = exhaustion->NeedStage5->value;
-
-        util->LoadHungerStage1Val = hunger->NeedStage1->value;
-        util->LoadHungerStage2Val = hunger->NeedStage2->value;
-        util->LoadHungerStage3Val = hunger->NeedStage3->value;
-        util->LoadHungerStage4Val = hunger->NeedStage4->value;
-        util->LoadHungerStage5Val = hunger->NeedStage5->value;
-
-        util->coldShouldBeEnabled       = util->SMI_ColdShouldBeEnabled->value;
-        util->hungerShouldBeEnabled     = util->SMI_HungerShouldBeEnabled->value;
-        util->exhaustionShouldBeEnabled = util->SMI_ExhaustionShouldBeEnabled->value;
-
-        util->coldAVPenDisabled       = cold->NeedAvPenDisabled->value;
-        util->hungerAVPenDisabled     = hunger->NeedAvPenDisabled->value;
-        util->exhaustionAVPenDisabled = exhaustion->NeedAvPenDisabled->value;
-
-        util->coldResistMaxValue         = cold->Survival_ColdResistMaxValue->value;
-        util->coldAfflictionChance       = cold->Survival_AfflictionColdChance->value;
-        util->exhaustionAfflictionChance = exhaustion->Survival_AfflictionExhaustionChance->value;
-        util->hungerAfflictionChance     = hunger->Survival_AfflictionHungerChance->value;
-
-        util->exhaustionMaxValue = exhaustion->NeedMaxValue->value;
-        util->coldMaxValue       = cold->NeedMaxValue->value;
-        util->hungerMaxValue     = hunger->NeedMaxValue->value;
-
-        util->exhaustionRestorePerHour = exhaustion->Survival_ExhaustionRestorePerHour->value;
-
-        util->coldRate       = cold->SMI_ColdRate->value;
-        util->hungerRate     = hunger->NeedRate->value;
-        util->exhaustionRate = exhaustion->NeedRate->value;
     }
 };

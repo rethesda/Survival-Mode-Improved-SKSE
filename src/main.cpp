@@ -7,6 +7,7 @@
 #include "AvPenaltyManager.h"
 #include "SMI_API.h"
 #include "SMI_ModAPI.h"
+#include "Utility/GlobalValueUpdater.h"
 
 void InitLogger()
 {
@@ -41,6 +42,8 @@ void InitListener(SKSE::MessagingInterface::Message* a_msg)
 		break;
 	case SKSE::MessagingInterface::kDataLoaded:
 		FormLoader::GetSingleton()->LoadAllForms();
+        GlobalUpdater::LoadBindings();
+        GlobalUpdater::CacheGlobals();
         Utility::GetSingleton()->ClearSurvivalModeQuestScripts();
 		Settings::LoadSettings();
         Events::Register();

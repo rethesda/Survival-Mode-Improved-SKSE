@@ -267,55 +267,12 @@ public:
 
 	float MaxAvPenaltyPercent = 1.0f;
 
-    float MainUpdateInterval = 1.0f;
-    float AvUpdateInterval   = 0.5f;
-
-	//Global Load overwrite variables
-	float LoadColdStage1Val = 0.0f;
-	float LoadColdStage2Val = 0.0f;
-	float LoadColdStage3Val = 0.0f;
-	float LoadColdStage4Val = 0.0f;
-	float LoadColdStage5Val = 0.0f;
-
-	float LoadExhaustionStage1Val = 0.0f;
-	float LoadExhaustionStage2Val = 0.0f;
-	float LoadExhaustionStage3Val = 0.0f;
-	float LoadExhaustionStage4Val = 0.0f;
-	float LoadExhaustionStage5Val = 0.0f;
-
-	float LoadHungerStage1Val = 0.0f;
-	float LoadHungerStage2Val = 0.0f;
-	float LoadHungerStage3Val = 0.0f;
-	float LoadHungerStage4Val = 0.0f;
-	float LoadHungerStage5Val = 0.0f;
-
-	float coldShouldBeEnabled = 0.0f;
-	float exhaustionShouldBeEnabled = 0.0f;
-	float hungerShouldBeEnabled = 0.0f;
-
-	float coldAVPenDisabled = 0.0f;
-	float exhaustionAVPenDisabled = 0.0f;
-	float hungerAVPenDisabled = 0.0f;
-
-	float coldResistMaxValue = 0.0f;
-
-	float coldMaxValue = 0.0f;
-	float exhaustionMaxValue = 0.0f;
-	float hungerMaxValue = 0.0f;
-
-	float coldAfflictionChance = 0.0f;
-	float hungerAfflictionChance = 0.0f;
-	float exhaustionAfflictionChance = 0.0f;
+    const float MainUpdateInterval = 1.0f;
+    const float AvUpdateInterval   = 0.5f;
 
     float injury1AVPercent = 0.0f;
     float injury2AVPercent = 0.0f;
     float injury3AVPercent = 0.0f;
-
-	float exhaustionRestorePerHour = 0.0f;
-
-	float coldRate = 0.0f;
-	float hungerRate = 0.0f;
-	float exhaustionRate = 0.0f;
 
 	static Utility* GetSingleton()
 	{

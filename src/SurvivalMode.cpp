@@ -99,6 +99,7 @@ void SurvivalMode::StopSurvivalMode()
 	logger::info("SM stopped");
 }
 
+//Todo - Change specific vampire checks to a function in each need called "should update" or something
 void SurvivalMode::SendAllNeedsUpdate()
 {
 	if (Utility::PlayerIsVampire()) {
@@ -180,6 +181,7 @@ void SurvivalMode::ShowNotification(RE::BGSMessage* msg)
 	RE::DebugNotification(messageDesc.c_str());
 }
 
+//TODO- Why are the hook installs being called here? Why tf would I do that?
 bool SurvivalMode::InstallUpdateHook()
 {
 	auto& trampoline = SKSE::GetTrampoline();
