@@ -161,9 +161,11 @@
 
 #include <ClibUtil/editorID.hpp>
 
-#define DLLEXPORT __declspec(dllexport)
+//Xbyak
+#include <xbyak/xbyak.h>
 
-#include "Version.h"
+
+#define DLLEXPORT __declspec(dllexport)
 
 using namespace std::literals;
 using namespace REL::literals;
@@ -191,77 +193,85 @@ public:
 };
 
 template <typename TDerived, typename TEvent>
-class EventSingleton : public RE::BSTEventSink<TEvent>
+class EventHandler : public RE::BSTEventSink<TEvent>
 {
 protected:
-    constexpr EventSingleton() noexcept           = default;
-    constexpr ~EventSingleton() noexcept override = default;
+    constexpr EventHandler() noexcept           = default;
+    constexpr ~EventHandler() noexcept override = default;
 
 public:
-    constexpr EventSingleton(const EventSingleton&) = delete;
-    constexpr EventSingleton(EventSingleton&&)      = delete;
-    constexpr auto operator=(const EventSingleton&) = delete;
-    constexpr auto operator=(EventSingleton&&)      = delete;
+    constexpr EventHandler(const EventHandler&)   = delete;
+    constexpr EventHandler(EventHandler&&)        = delete;
+    constexpr auto operator=(const EventHandler&) = delete;
+    constexpr auto operator=(EventHandler&&)      = delete;
 
-    [[nodiscard]] static constexpr TDerived* GetSingleton() noexcept
+    [[nodiscard]] static constexpr auto Get() noexcept
     {
-        static TDerived singleton;
-        return std::addressof(singleton);
+        static TDerived handler;
+        return std::addressof(handler);
     }
 
-    static constexpr void Register() noexcept
+    static constexpr auto Register() noexcept
     {
         using TEventSource = RE::BSTEventSource<TEvent>;
 
-        constexpr std::string dirty_name{ typeid(TEvent).name() };
-        const std::regex      p{ "struct |RE::|SKSE::| * __ptr64" };
-        const auto            name{ std::regex_replace(dirty_name, p, "") };
+        const std::string dirty_name{ typeid(TEvent).name() };
+        const std::regex  p{ "class |struct |RE::|SKSE::| * __ptr64" };
+        const auto        name{ std::regex_replace(dirty_name, p, "") };
 
         if constexpr (std::is_base_of_v<TEventSource, RE::BSInputDeviceManager>) {
             const auto manager{ RE::BSInputDeviceManager::GetSingleton() };
-            manager->AddEventSink(GetSingleton());
+            manager->AddEventSink(Get());
             logger::info("Registered {} handler", name);
+            logger::info("");
             return;
         }
         else if constexpr (std::is_base_of_v<TEventSource, RE::UI>) {
             const auto ui{ RE::UI::GetSingleton() };
-            ui->AddEventSink(GetSingleton());
+            ui->AddEventSink(Get());
             logger::info("Registered {} handler", name);
+            logger::info("");
             return;
         }
         else if constexpr (std::is_same_v<TEvent, SKSE::ActionEvent>) {
-            SKSE::GetActionEventSource()->AddEventSink(GetSingleton());
+            SKSE::GetActionEventSource()->AddEventSink(Get());
             logger::info("Registered {} handler", name);
+            logger::info("");
             return;
         }
         else if constexpr (std::is_same_v<TEvent, SKSE::CameraEvent>) {
-            SKSE::GetCameraEventSource()->AddEventSink(GetSingleton());
+            SKSE::GetCameraEventSource()->AddEventSink(Get());
             logger::info("Registered {} handler", name);
+            logger::info("");
             return;
         }
         else if constexpr (std::is_same_v<TEvent, SKSE::CrosshairRefEvent>) {
-            SKSE::GetCrosshairRefEventSource()->AddEventSink(GetSingleton());
+            SKSE::GetCrosshairRefEventSource()->AddEventSink(Get());
             logger::info("Registered {} handler", name);
+            logger::info("");
             return;
         }
         else if constexpr (std::is_same_v<TEvent, SKSE::ModCallbackEvent>) {
-            SKSE::GetModCallbackEventSource()->AddEventSink(GetSingleton());
+            SKSE::GetModCallbackEventSource()->AddEventSink(Get());
             logger::info("Registered {} handler", name);
+            logger::info("");
             return;
         }
         else if constexpr (std::is_same_v<TEvent, SKSE::NiNodeUpdateEvent>) {
-            SKSE::GetNiNodeUpdateEventSource()->AddEventSink(GetSingleton());
+            SKSE::GetNiNodeUpdateEventSource()->AddEventSink(Get());
             logger::info("Registered {} handler", name);
+            logger::info("");
             return;
         }
         else if constexpr (std::is_base_of_v<TEventSource, RE::ScriptEventSourceHolder>) {
             const auto holder{ RE::ScriptEventSourceHolder::GetSingleton() };
-            holder->AddEventSink(GetSingleton());
+            holder->AddEventSink(Get());
             logger::info("Registered {} handler", name);
+            logger::info("");
             return;
         }
         const auto plugin{ SKSE::PluginDeclaration::GetSingleton() };
-        SKSE::stl::report_and_fail(fmt::format("{}: Failed to register {} handler", plugin->GetName(), name));
+        SKSE::stl::report_and_fail(std::format("{}: Failed to register {} handler", plugin->GetName(), name));
     }
 };
 

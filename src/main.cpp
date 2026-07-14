@@ -9,42 +9,21 @@
 #include "SMI_ModAPI.h"
 #include "Utility/GlobalValueUpdater.h"
 
-void InitLogger()
-{
-    auto path{ SKSE::log::log_directory() };
-    if (!path)
-        stl::report_and_fail("Unable to lookup SKSE logs directory.");
-    *path /= SKSE::PluginDeclaration::GetSingleton()->GetName();
-    *path += L".log";
-
-    std::shared_ptr<spdlog::logger> log;
-    if (IsDebuggerPresent())
-        log = std::make_shared<spdlog::logger>("Global", std::make_shared<spdlog::sinks::msvc_sink_mt>());
-    else
-        log = std::make_shared<spdlog::logger>("Global", std::make_shared<spdlog::sinks::basic_file_sink_mt>(path->string(), true));
-
-    log->set_level(spdlog::level::level_enum::info);
-    log->flush_on(spdlog::level::level_enum::trace);
-
-    set_default_logger(std::move(log));
-
-    spdlog::set_pattern("[%T.%e UTC%z] [%L] [%=5t] %v");
-}
-
 void InitListener(SKSE::MessagingInterface::Message* a_msg)
 {
 	switch (a_msg->type) {
 	case SKSE::MessagingInterface::kNewGame:
 		Serialization::LoadChecks();
+        Utility::GetSingleton()->ClearSurvivalModeQuestScripts();
 		break;
 	case SKSE::MessagingInterface::kPostLoadGame:
 		Serialization::LoadChecks();
+        Utility::GetSingleton()->ClearSurvivalModeQuestScripts();
 		break;
 	case SKSE::MessagingInterface::kDataLoaded:
 		FormLoader::GetSingleton()->LoadAllForms();
         GlobalUpdater::LoadBindings();
         GlobalUpdater::CacheGlobals();
-        Utility::GetSingleton()->ClearSurvivalModeQuestScripts();
 		Settings::LoadSettings();
         Events::Register();
         AvPenaltyManager::GetSingleton()->InitializeHandlers();
@@ -52,32 +31,16 @@ void InitListener(SKSE::MessagingInterface::Message* a_msg)
 	}
 }
 
-extern "C" DLLEXPORT constexpr auto SKSEPlugin_Version = []() {
-    SKSE::PluginVersionData v{};
-    v.PluginVersion(REL::Version{ Version::MAJOR, Version::MINOR, Version::PATCH, 0 });
-    v.PluginName("SurvivalModeImproved"sv);
-    v.AuthorName("colinswrath"sv);
-    v.UsesAddressLibrary(true);
-    v.HasNoStructUse(true);
-    v.UsesStructsPost629(false);
-    return v;
-}();
-
 SKSEPluginLoad(const SKSE::LoadInterface* skse)
 {
-    InitLogger();
+    Init(skse);
 
     const auto plugin{ SKSE::PluginDeclaration::GetSingleton() };
+    const auto name{ plugin->GetName() };
     const auto version{ plugin->GetVersion() };
-    auto runtimcompat = plugin->GetRuntimeCompatibility();
+    logger::init();
 
     logger::info("{} {} loading...", plugin->GetName(), version);
-
-    #ifdef SKYRIM_SUPPORT_AE
-        logger::info("Post 1130 build is active.");
-    #endif // SKYRIM_SUPPORT_AE
-
-    SKSE::Init(skse);
 
     FormLoader::GetSingleton()->CacheGameAddresses();
     SKSE::AllocTrampoline(42);

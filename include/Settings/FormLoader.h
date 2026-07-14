@@ -324,7 +324,12 @@ public:
         utility->Survival_OverencumberedSpell     = dataHandler->LookupForm(RE::FormID(0x917), smEslPluginName)->As<RE::SpellItem>();
         utility->Survival_OblivionDisplaySpell    = dataHandler->LookupForm(RE::FormID(0x90E), smEslPluginName)->As<RE::SpellItem>();
 
-        utility->Survival_ModeEnabledShared = dataHandler->LookupForm(RE::FormID(0x314A), updatePluginName)->As<RE::TESGlobal>();
+        auto smShared                       = dataHandler->LookupForm(RE::FormID(0x314A), updatePluginName);
+        if (smShared)
+        {
+            utility->Survival_ModeEnabledShared = smShared->As<RE::TESGlobal>();
+        }
+
         utility->Survival_ModeCanBeEnabled  = dataHandler->LookupForm(RE::FormID(0xA0F), smEslPluginName)->As<RE::TESGlobal>();
 
         utility->Survival_OblivionAreaMessage = dataHandler->LookupForm(RE::FormID(0x937), smEslPluginName)->As<RE::BGSMessage>();

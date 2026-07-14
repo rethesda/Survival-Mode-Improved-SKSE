@@ -48,15 +48,15 @@ void SurvivalMode::SurvivalModeLoopUpdate()
 
 void SurvivalMode::AvPenaltyCheckUpdate()
 {
-    auto avMan = AvPenaltyManager::GetSingleton();
+    auto avMan   = AvPenaltyManager::GetSingleton();
     auto utility = Utility::GetSingleton();
 
-    if (!utility->IsSurvivalEnabled() || !utility->SurvivalToggle()) {
-        avMan->RemoveAllAvPenalties();
-    }
-    else {
-        avMan->UpdateActorValuePenalties();
-    }
+    /*   if (!utility->IsSurvivalEnabled() || !utility->SurvivalToggle()) {
+           avMan->RemoveAllAvPenalties();
+       }
+       else {*/
+    avMan->UpdateActorValuePenalties();
+    //}
 }
 
 void SurvivalMode::MiscStatusChecks()
@@ -80,8 +80,7 @@ void SurvivalMode::StartSurvivalMode()
 		auto utility = Utility::GetSingleton();
 		AddPlayerSpellPerks();
 		SendAllNeedsUpdate();
-		utility->Survival_ModeEnabled->value = 1.0f;
-		utility->Survival_ModeEnabledShared->value = 1.0f;
+        utility->SetSurvivalModeEnabled(1.0f);
 		logger::info("SM started");
 
 	}
@@ -94,8 +93,7 @@ void SurvivalMode::StopSurvivalMode()
 	auto utility = Utility::GetSingleton();
 	StopAllNeeds();
 	RemovePlayerSpellPerks();
-	utility->Survival_ModeEnabled->value = 0;
-	utility->Survival_ModeEnabledShared->value = 0;
+    utility->SetSurvivalModeEnabled(0.0f);
 	logger::info("SM stopped");
 }
 
@@ -178,7 +176,7 @@ void SurvivalMode::ShowNotification(RE::BGSMessage* msg)
 {
 	RE::BSString messageDesc;
 	msg->GetDescription(messageDesc, msg);
-	RE::DebugNotification(messageDesc.c_str());
+    RE::SendHUDMessage::ShowHUDMessage(messageDesc.c_str());
 }
 
 //TODO- Why are the hook installs being called here? Why tf would I do that?

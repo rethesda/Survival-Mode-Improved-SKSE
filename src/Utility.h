@@ -357,21 +357,15 @@ public:
 		return util->Survival_ModeEnabled->value;
 	}
 
-	static void ShowNotification(RE::BGSMessage* msg, bool messageBox=false)
+	static void ShowNotification(RE::BGSMessage* msg, bool tutorial=false)
 	{
 		RE::BSString messageDesc;
 		msg->GetDescription(messageDesc, msg);
-		if (messageBox) {
-			RE::DebugMessageBox(messageDesc.c_str());
-			/*
-			auto tut = RE::UI::GetSingleton()->GetMenu(RE::TutorialMenu::MENU_NAME);
-			RE::UIMessage 
-			tut->ProcessMessage()
-			auto uiQueue = RE::UIMessageQueue::GetSingleton();
-			uiQueue->AddMessage(RE::TutorialMenu::MENU_NAME, RE::UI_MESSAGE_TYPE::kShow, uiQueue->CreateUIMessageData("TEST")); 
-			*/
+		if (tutorial) {
+            RE::TutorialMenu::OpenMenu(msg);
+			//RE::DebugMessageBox(messageDesc.c_str());
 		} else {
-			RE::DebugNotification(messageDesc.c_str());
+            RE::SendHUDMessage::ShowHUDMessage(messageDesc.c_str());
 		}
 	}
 
@@ -382,6 +376,14 @@ public:
         for(auto* quest: smQuestsToHandle)
         {
             DetachQuestScripts(quest);
+        }
+    }
+
+    void SetSurvivalModeEnabled(float value)
+    {
+        Survival_ModeEnabled->value = value;
+        if (Survival_ModeEnabledShared) {
+            Survival_ModeEnabledShared->value = value;
         }
     }
 
@@ -403,6 +405,22 @@ public:
 
         vm->ResetAllBoundObjects(handle);
         vm->GetObjectBindPolicy()->bindInterface->RemoveAllBoundObjects(handle);
+
+        logger::info("Removing scripts from quest aliases");
+        for (auto alias : quest->aliases) {
+            auto aliasHandle = policy->GetHandleForObject(alias->GetVMTypeID(), alias);
+
+            if (const auto it = vm->attachedScripts.find(aliasHandle); it != vm->attachedScripts.end()) {
+                for (auto& script : it->second) {
+                    if (auto typeInfo = script ? script->GetTypeInfo() : nullptr) {
+                        logger::info("Attached alias script found. Clearing {}", typeInfo->name.c_str());
+                    }
+                }
+            }
+
+            vm->ResetAllBoundObjects(aliasHandle);
+            vm->GetObjectBindPolicy()->bindInterface->RemoveAllBoundObjects(aliasHandle);
+        }
     }
 
 	bool SurvivalToggle()
@@ -491,7 +509,7 @@ public:
     {
         auto* package = Utility::GetPlayer()->GetCurrentPackage();
 
-        if (package && package->packData.packType == RE::PACKAGE_PROCEDURE_TYPE::kVampireFeed) {
+        if (package && package->packData.packType == RE::PACKAGE_TYPE::kVampireFeed) {
             return true;
         }
         return false;
@@ -509,6 +527,19 @@ public:
 
 		return lich;
 	}
+
+    static bool IsItemQuestItem(RE::AlchemyItem* eatenItem)
+    {
+        auto inv = Utility::GetPlayer()->GetInventory();
+
+        for (const auto& [item, data] : inv) {
+            auto& entryData = data.second;
+            if (entryData && entryData->IsQuestObject() && item->GetFormID() == eatenItem->GetFormID()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 	static bool PlayerIsInJail()
 	{
